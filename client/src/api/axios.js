@@ -5,7 +5,7 @@ const isDev = import.meta.env.DEV;
 
 const API_URL = isDev
     ? `http://${window.location.hostname}:5000`
-    : import.meta.env.BACKEND_PRODUCTION_URL;
+    : import.meta.env.VITE_API_URL;
 
 
 const axiosClient = axios.create({
