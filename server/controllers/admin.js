@@ -42,6 +42,7 @@ const admin_register = async (req, res) => {
 
 const adminLogin = async (req, res) => {
     const { email, password } = req.body;
+    console.log(email, password)
 
     try {
 
