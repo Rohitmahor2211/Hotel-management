@@ -5,7 +5,7 @@ const path = require('path')
 
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
-    port: 587,
+    port: 465,
     secure: false, // use STARTTLS (upgrade connection to TLS after connecting)
     auth: {
         user: process.env.EMAIL,
@@ -14,30 +14,34 @@ const transporter = nodemailer.createTransport({
 });
 
 
-
+transporter.verify((error, success) => {
+    if (error) {
+        console.log("SMTP Error:", error);
+    } else {
+        console.log("SMTP Ready");
+    }
+});
 
 
 const sendMail = async (admin, otp) => {
-    console.log("in mail service", admin)
+    try {
+        console.log("Before sendMail");
 
-    const templatePath = path.join(
-        __dirname,
-        "../views/otp-template.ejs"
-    );
+        const result = await transporter.sendMail({
+            from: process.env.EMAIL,
+            to: admin.email,
+            subject: "OTP Verification",
+            html,
+        });
 
-    const html = await ejs.renderFile(templatePath, {
-        otp: otp
-    });
-    const result = await transporter.sendMail({
-        from: process.env.EMAIL,
-        to: admin.email,
-        subject: "OTP Verification",
-        html
-    });
+        console.log("Mail sent:", result.response);
+        return result;
 
-    console.log("mail sent successfully", result)
-    return result
-}
+    } catch (err) {
+        console.error("SENDMAIL ERROR:", err);
+        throw err;
+    }
+};
 
 
 module.exports = sendMail;
