@@ -22,6 +22,8 @@ transporter.verify((error, success) => {
     }
 });
 
+const templatePath = path.join(__dirname, "../views/otp-template.ejs");
+const html = await ejs.renderFile(templatePath, { otp: otp });
 
 const sendMail = async (admin, otp) => {
     try {
