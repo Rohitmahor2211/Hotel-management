@@ -18,7 +18,7 @@ const transporter = nodemailer.createTransport({
 
 
 const sendMail = async (admin, otp) => {
-    // console.log(admin)
+    console.log("in mail service", admin)
 
     const templatePath = path.join(
         __dirname,
@@ -28,12 +28,15 @@ const sendMail = async (admin, otp) => {
     const html = await ejs.renderFile(templatePath, {
         otp: otp
     });
-    await transporter.sendMail({
+    const result = await transporter.sendMail({
         from: process.env.EMAIL,
         to: admin.email,
         subject: "OTP Verification",
         html
     });
+
+    console.log("mail sent successfully", result)
+    return result
 }
 
 

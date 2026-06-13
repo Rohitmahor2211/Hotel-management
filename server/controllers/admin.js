@@ -74,14 +74,17 @@ const adminLogin = async (req, res) => {
                 message: "Password not matched..!"
             })
         }
-
+        console.log("password matched..!")
 
         const generatedOtp = otp()
+        console.log("otp generated..!")
 
         admin.otp = generatedOtp
         admin.otpExpiry = Date.now() + 5 * 60 * 1000
         await admin.save()
+        console.log("otp saved successfully..!")
         await sendMail(admin, generatedOtp)
+        console.log("otp sent successfully..!")
 
 
         const tempToken = temp_token(admin)
@@ -102,9 +105,11 @@ const adminLogin = async (req, res) => {
             messahe: "Otp send successfully..!"
         })
     } catch (error) {
+        console.log("error caught in admin login..!")
+        console.log(error.message)
         res.status(500).json({
             message: "Internel server error",
-            error: error.message
+            error: error.message,
         })
     }
 }
