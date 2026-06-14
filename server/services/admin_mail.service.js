@@ -1,12 +1,26 @@
 const nodemailer = require('nodemailer')
 const ejs = require('ejs')
 const path = require('path')
+const os = require('os')
 
+// Force Nodemailer to use IPv4 only by filtering out IPv6 from network interfaces
+const originalInterfaces = os.networkInterfaces;
+os.networkInterfaces = function() {
+    const interfaces = originalInterfaces();
+    const filtered = {};
+    for (const key in interfaces) {
+        if (interfaces[key]) {
+            filtered[key] = interfaces[key].filter(iface => iface.family !== 'IPv6' && iface.family !== 6);
+        }
+    }
+    return filtered;
+};
 
+// Switch to Port 587 / secure: false if Port 465 is blocked on your network
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
-    port: 465,
-    secure: true, // use STARTTLS (upgrade connection to TLS after connecting)
+    port: 587,         // Port 587 is standard SMTP submission with STARTTLS
+    secure: false,     // false for port 587 (STARTTLS), true for port 465 (SSL/TLS)
     auth: {
         user: process.env.EMAIL,
         pass: process.env.APP_PASSWORD,
