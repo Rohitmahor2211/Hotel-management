@@ -1,8 +1,4 @@
 require('dotenv').config()
-const dns = require("dns");
-dns.lookup("smtp.gmail.com", { all: true }, (err, addresses) => {
-    console.log("SMTP DNS:", addresses);
-});
 const express = require('express')
 const cors = require('cors')
 const cookieparser = require('cookie-parser')

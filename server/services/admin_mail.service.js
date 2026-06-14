@@ -1,47 +1,10 @@
 const nodemailer = require('nodemailer')
 const ejs = require('ejs')
 const path = require('path')
-const os = require('os')
-
-// Force Nodemailer to use IPv4 only by filtering out IPv6 from network interfaces
-// const originalInterfaces = os.networkInterfaces;
-// os.networkInterfaces = function () {
-//     const interfaces = originalInterfaces();
-//     const filtered = {};
-//     for (const key in interfaces) {
-//         if (interfaces[key]) {
-//             filtered[key] = interfaces[key].filter(iface => iface.family !== 'IPv6' && iface.family !== 6);
-//         }
-//     }
-//     return filtered;
-// };
-
-// Switch to Port 587 / secure: false if Port 465 is blocked on your network
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,         // Port 587 is standard SMTP submission with STARTTLS
-    secure: false,     // false for port 587 (STARTTLS), true for port 465 (SSL/TLS)
-
-    lookup(hostname, options, callback) {
-        return dns.lookup(hostname, { family: 4 }, callback);
-    },
+const { Resend } = require('resend')
 
 
-    auth: {
-        user: process.env.EMAIL,
-        pass: process.env.APP_PASSWORD,
-    },
-});
-
-
-transporter.verify((error, success) => {
-    if (error) {
-        console.log("SMTP Error:", error);
-    } else {
-        console.log("SMTP Ready");
-    }
-});
-
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendMail = async (admin, otp) => {
     const templatePath = path.join(__dirname, "../views/otp-template.ejs");
@@ -49,15 +12,14 @@ const sendMail = async (admin, otp) => {
     try {
         console.log("Before sendMail");
 
-        const result = await transporter.sendMail({
-            from: process.env.EMAIL,
+        const result = await resend.emails.send({
+            from: "onboarding@resend.dev",
             to: admin.email,
             subject: "OTP Verification",
-            html,
+            html: html,
         });
 
         console.log("Mail sent:", result.response);
-        return result;
 
     } catch (err) {
         console.error("SENDMAIL ERROR:", err);
